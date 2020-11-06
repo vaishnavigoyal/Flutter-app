@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/Screens/Login/components/background.dart';
 import 'package:flutter_auth/Screens/Signup/signup_screen.dart';
@@ -6,11 +7,17 @@ import 'package:flutter_auth/components/rounded_button.dart';
 import 'package:flutter_auth/components/rounded_input_field.dart';
 import 'package:flutter_auth/components/rounded_password_field.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class Body extends StatelessWidget {
   const Body({
     Key key,
   }) : super(key: key);
+
+  get googleSignIn => null;
+
+  get firebaseAuth => null;
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +47,34 @@ class Body extends StatelessWidget {
             RoundedButton(
               text: "LOGIN",
               press: () {},
+            ),
+            SizedBox(height: 20),
+            MaterialButton(
+              elevation: 0,
+              minWidth: double.maxFinite,
+              height: 50,
+              onPressed: () async {
+                final GoogleSignInAccount googleUser = await googleSignIn.signIn();
+                final GoogleSignInAuthentication googleAuth =
+                await googleUser.authentication;
+
+                final AuthCredential credential = GoogleAuthProvider.getCredential(
+                    idToken: googleAuth.idToken, accessToken: googleAuth.accessToken);
+
+                final FirebaseUser user =
+                    (await firebaseAuth.signInWithCredential(credential)).user;
+              },
+              color: Colors.blue,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(FontAwesomeIcons.google),
+                  SizedBox(width: 10),
+                  Text('Sign-in using Google',
+                      style: TextStyle(color: Colors.white, fontSize: 16)),
+                ],
+              ),
+              textColor: Colors.white,
             ),
             SizedBox(height: size.height * 0.03),
             AlreadyHaveAnAccountCheck(
